@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SaveTimeAI – AI Agents for Houston Small Businesses</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/3.13.3/cdn.min.js" defer></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.js"></script>
+  <style>
+    :root {
+      --ink: #0d1117;
+      --ink-soft: #1c2430;
+      --surface: #f5f2ed;
+      --accent: #e8500a;
+      --accent-light: #ff6b2b;
+      --gold: #c9963a;
+      --muted: #6b7280;
+      --border: rgba(0,0,0,0.08);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--surface);
+      color: var(--ink);
+      overflow-x: hidden;
+    }
+
+    h1, h2, h3, h4, nav .logo {
+      font-family: 'Syne', sans-serif;
+    }
+
+    /* ── NAVBAR ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      background: rgba(245,242,237,0.92);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+      transition: box-shadow 0.3s;
+    }
+    nav.scrolled { box-shadow: 0 4px 32px rgba(0,0,0,0.08); }
+
+    .nav-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+      height: 68px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      font-size: 1.35rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: var(--ink);
+      text-decoration: none;
+    }
+    .logo span { color: var(--accent); }
+
+    .nav-links { display: flex; gap: 2rem; list-style: none; }
+    .nav-links a {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--ink);
+      text-decoration: none;
+      opacity: 0.7;
+      transition: opacity 0.2s;
+    }
+    .nav-links a:hover { opacity: 1; }
+
+    .nav-cta {
+      background: var(--accent);
+      color: #fff !important;
+      opacity: 1 !important;
+      padding: 0.5rem 1.2rem;
+      border-radius: 6px;
+      font-weight: 600 !important;
+      transition: background 0.2s !important;
+    }
+    .nav-cta:hover { background: var(--accent-light) !important; }
+
+    /* mobile menu toggle */
+    .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; }
+    .hamburger span { display: block; width: 24px; height: 2px; background: var(--ink); border-radius: 2px; transition: 0.3s; }
+
+    @media (max-width: 768px) {
+      .hamburger { display: flex; }
+      .nav-links {
+        display: none;
+        position: absolute;
+        top: 68px; left: 0; right: 0;
+        background: var(--surface);
+        flex-direction: column;
+        gap: 0;
+        border-bottom: 1px solid var(--border);
+        padding: 0.5rem 0;
+      }
+      .nav-links.open { display: flex; }
+      .nav-links li { padding: 0; }
+      .nav-links a { display: block; padding: 0.85rem 1.5rem; opacity: 0.8; }
+    }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding-top: 68px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 70% 60% at 80% 30%, rgba(232,80,10,0.09) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 50% at 10% 80%, rgba(201,150,58,0.07) 0%, transparent 60%);
+    }
+
+    /* Grid texture */
+    .hero-bg::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(13,17,23,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(13,17,23,0.04) 1px, transparent 1px);
+      background-size: 48px 48px;
+    }
+
+    .hero-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 5rem 1.5rem 4rem;
+      position: relative;
+      z-index: 2;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(232,80,10,0.1);
+      border: 1px solid rgba(232,80,10,0.2);
+      color: var(--accent);
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.4rem 0.9rem;
+      border-radius: 100px;
+      margin-bottom: 1.75rem;
+      animation: fadeUp 0.6s ease both;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.8rem, 6vw, 5.2rem);
+      font-weight: 800;
+      line-height: 1.05;
+      letter-spacing: -0.04em;
+      color: var(--ink);
+      max-width: 800px;
+      animation: fadeUp 0.6s ease 0.1s both;
+    }
+
+    .hero h1 em {
+      font-style: normal;
+      color: var(--accent);
+      position: relative;
+    }
+
+    .hero-sub {
+      font-size: clamp(1rem, 2vw, 1.2rem);
+      color: var(--muted);
+      max-width: 560px;
+      line-height: 1.65;
+      margin-top: 1.5rem;
+      font-weight: 300;
+      animation: fadeUp 0.6s ease 0.2s both;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-top: 2.5rem;
+      animation: fadeUp 0.6s ease 0.3s both;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      padding: 0.9rem 2rem;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 20px rgba(232,80,10,0.25);
+    }
+    .btn-primary:hover {
+      background: var(--accent-light);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(232,80,10,0.35);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--ink);
+      font-family: 'Syne', sans-serif;
+      font-weight: 600;
+      font-size: 1rem;
+      padding: 0.9rem 2rem;
+      border-radius: 8px;
+      border: 2px solid rgba(13,17,23,0.15);
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .btn-secondary:hover { border-color: var(--ink); background: rgba(13,17,23,0.04); }
+
+    .hero-stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2.5rem;
+      margin-top: 4rem;
+      animation: fadeUp 0.6s ease 0.4s both;
+    }
+    .stat-item { display: flex; flex-direction: column; }
+    .stat-num {
+      font-family: 'Syne', sans-serif;
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--ink);
+      line-height: 1;
+    }
+    .stat-label { font-size: 0.82rem; color: var(--muted); margin-top: 0.3rem; font-weight: 400; }
+
+    /* ── SECTION COMMON ── */
+    section { padding: 5rem 1.5rem; }
+    .section-inner { max-width: 1200px; margin: 0 auto; }
+
+    .section-tag {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1rem;
+      display: block;
+    }
+
+    .section-title {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: var(--ink);
+      line-height: 1.1;
+    }
+
+    .section-sub {
+      font-size: 1.05rem;
+      color: var(--muted);
+      line-height: 1.65;
+      max-width: 520px;
+      margin-top: 0.75rem;
+      font-weight: 300;
+    }
+
+    /* ── VIDEO SECTION ── */
+    .video-section { background: var(--ink); }
+    .video-section .section-title { color: #fff; }
+    .video-section .section-tag { color: var(--accent-light); }
+    .video-section .section-sub { color: rgba(255,255,255,0.55); }
+
+    .video-wrap {
+      margin-top: 3rem;
+      border-radius: 16px;
+      overflow: hidden;
+      position: relative;
+      aspect-ratio: 16/9;
+      box-shadow: 0 40px 100px rgba(0,0,0,0.5);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .video-wrap iframe {
+      width: 100%; height: 100%;
+      border: none;
+    }
+
+    /* ── HOW IT WORKS ── */
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      margin-top: 3.5rem;
+    }
+
+    .step-card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 2.25rem;
+      border: 1px solid rgba(13,17,23,0.07);
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.25s, box-shadow 0.25s;
+    }
+    .step-card:hover { transform: translateY(-4px); box-shadow: 0 20px 60px rgba(0,0,0,0.08); }
+
+    .step-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent), var(--gold));
+    }
+
+    .step-num {
+      font-family: 'Syne', sans-serif;
+      font-size: 3.5rem;
+      font-weight: 800;
+      color: rgba(232,80,10,0.1);
+      line-height: 1;
+      margin-bottom: 1rem;
+    }
+
+    .step-icon {
+      width: 48px; height: 48px;
+      background: rgba(232,80,10,0.1);
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 1.25rem;
+      font-size: 1.4rem;
+    }
+
+    .step-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 0.6rem;
+    }
+
+    .step-desc { font-size: 0.93rem; color: var(--muted); line-height: 1.65; }
+
+    /* ── GUARANTEE ── */
+    .guarantee-section {
+      background: linear-gradient(135deg, var(--ink) 0%, #1a2535 100%);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .guarantee-section::before {
+      content: '';
+      position: absolute;
+      top: -50%; right: -10%;
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(232,80,10,0.12) 0%, transparent 70%);
+    }
+
+    .guarantee-inner {
+      max-width: 900px;
+      margin: 0 auto;
+      text-align: center;
+      position: relative;
+      z-index: 2;
+    }
+
+    .guarantee-badge {
+      width: 80px; height: 80px;
+      background: rgba(232,80,10,0.15);
+      border: 2px solid rgba(232,80,10,0.3);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2rem;
+      margin: 0 auto 2rem;
+    }
+
+    .guarantee-section .section-title { color: #fff; font-size: clamp(2rem, 4vw, 3.2rem); }
+    .guarantee-section .section-sub { color: rgba(255,255,255,0.6); margin: 1.25rem auto 0; max-width: 620px; font-size: 1.05rem; }
+
+    .guarantee-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.25rem;
+      margin-top: 3rem;
+    }
+
+    .g-card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 1.75rem;
+      text-align: left;
+    }
+
+    .g-card-icon { font-size: 1.6rem; margin-bottom: 0.75rem; }
+    .g-card-title { font-family: 'Syne', sans-serif; font-weight: 700; color: #fff; font-size: 1rem; margin-bottom: 0.4rem; }
+    .g-card-text { font-size: 0.87rem; color: rgba(255,255,255,0.5); line-height: 1.6; }
+
+    /* ── CONTACT ── */
+    .contact-section { background: #fff; }
+
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      margin-top: 3.5rem;
+      align-items: start;
+    }
+
+    @media (max-width: 768px) { .contact-grid { grid-template-columns: 1fr; gap: 2.5rem; } }
+
+    .contact-left .section-sub { max-width: 100%; }
+
+    .trust-items { display: flex; flex-direction: column; gap: 1rem; margin-top: 2rem; }
+    .trust-item { display: flex; align-items: center; gap: 0.75rem; font-size: 0.9rem; color: var(--muted); }
+    .trust-dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; flex-shrink: 0; }
+
+    /* Form */
+    .contact-form { display: flex; flex-direction: column; gap: 1rem; }
+
+    .form-group { display: flex; flex-direction: column; gap: 0.4rem; }
+    .form-group label { font-size: 0.82rem; font-weight: 600; color: var(--ink); letter-spacing: 0.02em; }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem;
+      padding: 0.8rem 1rem;
+      border: 1.5px solid rgba(13,17,23,0.12);
+      border-radius: 8px;
+      background: var(--surface);
+      color: var(--ink);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      width: 100%;
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(232,80,10,0.1);
+    }
+    .form-group textarea { resize: vertical; min-height: 100px; }
+
+    .form-submit {
+      background: var(--accent);
+      color: #fff;
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      padding: 1rem 2rem;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.2s;
+      margin-top: 0.5rem;
+      box-shadow: 0 4px 20px rgba(232,80,10,0.25);
+    }
+    .form-submit:hover { background: var(--accent-light); transform: translateY(-1px); }
+
+    /* ── SOCIAL PROOF ── */
+    .proof-section { padding: 5rem 1.5rem; background: var(--ink); }
+    .proof-section .section-inner { max-width: 1200px; margin: 0 auto; text-align: center; }
+    .proof-section .section-tag { color: var(--accent-light); }
+    .proof-section .section-title { color: #fff; }
+    .proof-section .section-sub { color: rgba(255,255,255,0.5); }
+    .proof-grid {
+      max-width: 1200px; margin: 3rem auto 0;
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;
+    }
+    .proof-card {
+      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px; padding: 2rem; text-align: left;
+    }
+    .proof-stars { color: var(--gold); font-size: 1.1rem; margin-bottom: 1rem; }
+    .proof-quote { color: rgba(255,255,255,0.75); font-size: 0.95rem; line-height: 1.7; margin-bottom: 1.5rem; }
+    .proof-author { display: flex; align-items: center; gap: 0.75rem; }
+    .proof-avatar {
+      width: 42px; height: 42px; border-radius: 50%; background: var(--accent);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Syne', sans-serif; font-weight: 700; color: #fff; font-size: 1rem; flex-shrink: 0;
+    }
+    .proof-name { font-weight: 600; color: #fff; font-size: 0.9rem; }
+    .proof-biz { color: rgba(255,255,255,0.4); font-size: 0.8rem; }
+
+    /* ── FAQ ── */
+    .faq-section { padding: 5rem 1.5rem; }
+    .faq-list { max-width: 760px; margin: 3rem auto 0; display: flex; flex-direction: column; gap: 1rem; }
+    .faq-item { background: #fff; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+    .faq-q {
+      width: 100%; text-align: left; padding: 1.25rem 1.5rem;
+      background: none; border: none; cursor: pointer;
+      font-family: 'Syne', sans-serif; font-weight: 600; font-size: 1rem;
+      color: var(--ink); display: flex; justify-content: space-between; align-items: center; gap: 1rem;
+    }
+    .faq-q:hover { color: var(--accent); }
+    .faq-icon { font-size: 1.2rem; transition: transform 0.3s; flex-shrink: 0; }
+    .faq-item.open .faq-icon { transform: rotate(45deg); }
+    .faq-a {
+      max-height: 0; overflow: hidden; transition: max-height 0.4s ease, padding 0.3s;
+      font-size: 0.95rem; color: var(--muted); line-height: 1.7; padding: 0 1.5rem;
+    }
+    .faq-item.open .faq-a { max-height: 300px; padding: 0 1.5rem 1.25rem; }
+
+    /* ── FLOATING WHATSAPP BUTTON ── */
+    .float-btn {
+      position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 999;
+      background: #25D366; color: #fff; border: none; border-radius: 50px;
+      padding: 0.85rem 1.4rem; font-family: 'Syne', sans-serif;
+      font-weight: 700; font-size: 0.9rem; cursor: pointer;
+      display: flex; align-items: center; gap: 0.5rem;
+      box-shadow: 0 4px 20px rgba(37,211,102,0.4);
+      text-decoration: none; transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .float-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 32px rgba(37,211,102,0.5); }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--ink); color: rgba(255,255,255,0.4);
+      text-align: center; padding: 2.5rem 1.5rem; font-size: 0.85rem;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+    footer strong { color: rgba(255,255,255,0.7); font-family: 'Syne', sans-serif; }
+    footer a { color: rgba(255,255,255,0.5); text-decoration: none; transition: color 0.2s; }
+    footer a:hover { color: var(--accent-light); }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(28px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(32px);
+      transition: opacity 0.65s ease, transform 0.65px ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* divider */
+    .divider { width: 48px; height: 3px; background: var(--accent); border-radius: 2px; margin: 1.25rem 0; }
+  </style>
+</head>
+<body x-data="{ menuOpen: false }">
+
+  <!-- ── NAVBAR ── -->
+  <nav>
+    <div class="nav-inner">
+      <a href="#" class="logo">Save<span>Time</span>AI</a>
+
+      <div class="hamburger" @click="menuOpen = !menuOpen">
+        <span></span><span></span><span></span>
+      </div>
+
+      <ul class="nav-links" :class="{ open: menuOpen }">
+        <li><a href="#home" @click="menuOpen=false">Home</a></li>
+        <li><a href="#how-it-works" @click="menuOpen=false">How It Works</a></li>
+        <li><a href="#demo" @click="menuOpen=false">Demo</a></li>
+        <li><a href="#contact" @click="menuOpen=false">Contact</a></li>
+        <li><a href="#contact" class="nav-cta" @click="menuOpen=false">Get Free Audit</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- ── HERO ── -->
+  <section id="home" class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-inner">
+      <div class="hero-badge">
+        🤖 AI Agents for Trades & Services
+      </div>
+
+      <h1>
+        We Find Where<br>
+        Your Business<br>
+        <em>Leaks Time.</em>
+      </h1>
+
+      <p class="hero-sub">
+        SaveTimeAI builds custom AI agents for plumbers, HVAC techs, electricians, and service businesses across America — so you can focus on the job, not the paperwork.
+      </p>
+
+      <div class="hero-actions">
+        <a href="#contact" class="btn-primary">Get My Free Audit →</a>
+        <a href="#demo" class="btn-secondary">Watch Demo</a>
+      </div>
+
+      <div class="hero-stats">
+        <div class="stat-item">
+          <span class="stat-num">5–10</span>
+          <span class="stat-label">Hours saved per week</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-num">$0</span>
+          <span class="stat-label">Until it proves results</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-num">72hr</span>
+          <span class="stat-label">Audit turnaround</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-num">Houston</span>
+          <span class="stat-label">Local & hands-on</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── DEMO VIDEO ── -->
+  <section id="demo" class="video-section">
+    <div class="section-inner">
+      <span class="section-tag">See It In Action</span>
+      <h2 class="section-title reveal">Watch How SaveTimeAI<br>Works in 2 Minutes</h2>
+      <p class="section-sub reveal">Real demos. No fluff. See exactly how our AI agent handles calls, scheduling, follow-ups, and more — so you don't have to.</p>
+
+      <div class="video-wrap reveal">
+        <iframe
+          src="https://www.youtube.com/embed/zEiPCdWQH7M"
+          title="SaveTimeAI Demo"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen>
+        </iframe>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── HOW IT WORKS ── -->
+  <section id="how-it-works">
+    <div class="section-inner">
+      <span class="section-tag">The Process</span>
+      <h2 class="section-title reveal">3 Steps to Getting<br>Your Time Back</h2>
+      <p class="section-sub reveal">Simple. Fast. No tech skills needed on your end.</p>
+
+      <div class="steps-grid">
+        <div class="step-card reveal">
+          <div class="step-num">01</div>
+          <div class="step-icon">🔍</div>
+          <h3 class="step-title">Free Business Audit</h3>
+          <p class="step-desc">We find out and dig into where your time actually goes — estimating, scheduling, answering calls, chasing invoices. No cost, no commitment. We find the leaks.</p>
+        </div>
+
+        <div class="step-card reveal">
+          <div class="step-num">02</div>
+          <div class="step-icon">🤖</div>
+          <h3 class="step-title">Custom AI Agent Built for You</h3>
+          <p class="step-desc">We build a dedicated AI agent tailored to your business — answering missed calls, booking jobs, sending follow-ups, generating quotes. Done for you, not a generic tool.</p>
+        </div>
+
+        <div class="step-card reveal">
+          <div class="step-num">03</div>
+          <div class="step-icon">💰</div>
+          <h3 class="step-title">Pay Only When It Works</h3>
+          <p class="step-desc">You only pay once the AI is saving you 5–10 hours per week. If it doesn't deliver, you owe us nothing. That's how confident we are it will work for your business.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── GUARANTEE ── -->
+  <section class="guarantee-section">
+    <div class="guarantee-inner">
+      <div class="guarantee-badge">🛡️</div>
+      <span class="section-tag" style="color: var(--accent-light);">Our Guarantee</span>
+      <h2 class="section-title reveal">If It Doesn't Save You<br>Time, You Don't Pay.</h2>
+      <p class="section-sub reveal">We're not here to sell you software. We're here to reclaim your evenings and weekends. If our AI agent doesn't save your business 5–10 hours per week, we work for free until it does.</p>
+
+      <div class="guarantee-cards reveal">
+        <div class="g-card">
+          <div class="g-card-icon">✅</div>
+          <div class="g-card-title">No Upfront Cost</div>
+          <div class="g-card-text">Zero payment until your agent is live and delivering real results.</div>
+        </div>
+        <div class="g-card">
+          <div class="g-card-icon">⚡</div>
+          <div class="g-card-title">48-Hour Setup</div>
+          <div class="g-card-text">From audit to a working AI agent — typically under three business days.</div>
+        </div>
+        <div class="g-card">
+          <div class="g-card-icon">🤝</div>
+          <div class="g-card-title">America Support</div>
+          <div class="g-card-text">We're WorldWide. You can call, text, or meet us in person. No offshore ticket systems.</div>
+        </div>
+        <div class="g-card">
+          <div class="g-card-icon">🔄</div>
+          <div class="g-card-title">Ongoing Optimization</div>
+          <div class="g-card-text">We continuously improve your agent as your business changes. Not a set-and-forget.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── CONTACT ── -->
+  <section id="contact" class="contact-section">
+    <div class="section-inner">
+      <div class="contact-grid">
+        <div class="contact-left">
+          <span class="section-tag">Get Started</span>
+          <h2 class="section-title reveal">Claim Your<br>Free Audit Today</h2>
+          <div class="divider"></div>
+          <p class="section-sub reveal">We'll analyze your workflow, identify where hours are slipping away, and show you exactly how an AI agent can fix it — all at no cost.</p>
+
+          <div class="trust-items reveal">
+            <div class="trust-item"><div class="trust-dot"></div> No contracts, no risk</div>
+            <div class="trust-item"><div class="trust-dot"></div> Works for plumbers, HVAC, electricians, roofers & more</div>
+            <div class="trust-item"><div class="trust-dot"></div> Locally owned & operated in Houston, TX</div>
+            <div class="trust-item"><div class="trust-dot"></div> You'll have answers in 48 hours or less</div>
+          </div>
+        </div>
+
+        <div class="contact-right reveal">
+          <form class="contact-form" action="https://formspree.io/f/mkoegozk" method="POST">
+            <div class="form-group">
+              <label>Your Name</label>
+              <input type="text" name="name" placeholder="e.g. John Martinez" required />
+            </div>
+            <div class="form-group">
+              <label>Business Name</label>
+              <input type="text" name="business" placeholder="e.g. Martinez HVAC & Cooling" required />
+            </div>
+            <div class="form-group">
+              <label>Phone Number</label>
+              <input type="tel" name="phone" placeholder="(713) 000-0000" required />
+            </div>
+            <div class="form-group">
+              <label>Email Address</label>
+              <input type="email" name="email" placeholder="john@yourcompany.com" required />
+            </div>
+            <div class="form-group">
+              <label>What type of business?</label>
+              <select name="business_type">
+                <option value="">Select your trade</option>
+                <option>Plumbing</option>
+                <option>HVAC / Cooling</option>
+                <option>Electrical</option>
+                <option>Roofing</option>
+                <option>Landscaping</option>
+                <option>Pest Control</option>
+                <option>Other Service Business</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Biggest time drain right now? (optional)</label>
+              <textarea name="message" placeholder="e.g. Missed calls, scheduling, follow-ups, invoicing..."></textarea>
+            </div>
+            <button type="submit" class="form-submit">
+              Book My Free Audit →
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SOCIAL PROOF ── -->
+  <section class="proof-section">
+    <div class="section-inner">
+      <span class="section-tag">Real Results</span>
+      <h2 class="section-title reveal">Houston Businesses<br>Already Saving Time</h2>
+      <p class="section-sub reveal">Early results from our pilot clients in the Houston area.</p>
+    </div>
+    <div class="proof-grid">
+      <div class="proof-card reveal">
+        <div class="proof-stars">★★★★★</div>
+        <p class="proof-quote">"I was missing 4-5 calls a day while out on jobs. Now the AI picks up, qualifies the lead, and texts me a summary. I've booked 3 new jobs I would have lost."</p>
+        <div class="proof-author">
+          <div class="proof-avatar">M</div>
+          <div>
+            <div class="proof-name">Mike R.</div>
+            <div class="proof-biz">Houston HVAC & Cooling</div>
+          </div>
+        </div>
+      </div>
+      <div class="proof-card reveal">
+        <div class="proof-stars">★★★★★</div>
+        <p class="proof-quote">"Follow-up used to fall through the cracks. Now every lead gets a response in minutes automatically. Saved me at least 8 hours a week on emails alone."</p>
+        <div class="proof-author">
+          <div class="proof-avatar">J</div>
+          <div>
+            <div class="proof-name">Jorge L.</div>
+            <div class="proof-biz">JL Plumbing Services</div>
+          </div>
+        </div>
+      </div>
+      <div class="proof-card reveal">
+        <div class="proof-stars">★★★★★</div>
+        <p class="proof-quote">"Skeptical at first — I'm not a tech guy. But the setup was done in 2 days and I didn't have to do anything. It just works in the background while I focus on the job."</p>
+        <div class="proof-author">
+          <div class="proof-avatar">D</div>
+          <div>
+            <div class="proof-name">David T.</div>
+            <div class="proof-biz">DTX Electrical</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FAQ ── -->
+  <section class="faq-section">
+    <div class="section-inner" style="text-align:center;">
+      <span class="section-tag">Questions</span>
+      <h2 class="section-title reveal">Frequently Asked<br>Questions</h2>
+      <p class="section-sub reveal">Straight answers.</p>
+    </div>
+    <div class="faq-list">
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          How much does it cost? <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-a">Nothing upfront. We build and set up your AI agent at no cost. You only pay once it's saving you 5–10 hours per week. After that, pricing is based on a small percentage.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          Will it mess with my existing systems? <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-a">Never. We run the AI in a completely separate system during the trial — your current phone, email, and software stay exactly as they are. We don't touch anything you already have running.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          I'm not tech savvy — is this too complicated for me? <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-a">Not at all. We handle 100% of the setup and maintenance. You don't need to know anything about AI or software. If you can read a text message, you can use what we build for you.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          How long does setup take? <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-a">Most agents are live within 72 hours of your free audit. We move fast because we know your time is money.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          What kinds of tasks can the AI actually handle? <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-a">Missed call follow-up, lead qualification, appointment booking, customer FAQs, quote requests, review responses, and more. We identify exactly which tasks to automate during your free audit.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          What if it doesn't work for my business? <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-a">Simple — you pay nothing. Our guarantee is that if the AI doesn't save your business 5–10 hours per week, we keep working until it does, at no charge. Zero risk on your end.</div>
+      </div>
+    </div>
+  </section>
+
+<!-- ── FLOATING CALL/TEXT BUTTON ── -->
+<a class="float-btn" href="sms:+18324645081" style="background:#e8500a;box-shadow:0 4px 20px rgba(232,80,10,0.4);">
+  📱 Text Us Now
+</a>
+  <footer>
+    <p><strong>SaveTimeAI</strong> &nbsp;·&nbsp; Houston, Texas &nbsp;·&nbsp; Serving local trades & service businesses</p>
+    <p style="margin-top:0.75rem;">
+      📞 <a href="tel:+1713YOURNUMBER">(832) 464-5081</a>
+      &nbsp;·&nbsp;
+      ✉️ <a href="mailto:hello@savetimeai.org">hello@savetimeai.org</a>
+      &nbsp;·&nbsp;
+      🌐 <a href="https://savetimeai.org">savetimeai.org</a>
+    </p>
+    <p style="margin-top:0.75rem; font-size:0.8rem;">© 2025 SaveTimeAI. All rights reserved.</p>
+  </footer>
+
+  <script>
+    // Nav scroll shadow
+    const nav = document.querySelector('nav');
+    window.addEventListener('scroll', () => {
+      nav.classList.toggle('scrolled', window.scrollY > 20);
+    });
+
+    // Scroll reveal
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((e, i) => {
+        if (e.isIntersecting) {
+          setTimeout(() => e.target.classList.add('visible'), i * 80);
+          observer.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.12 });
+    reveals.forEach(el => observer.observe(el));
+
+    // FAQ toggle
+    function toggleFaq(btn) {
+      const item = btn.closest('.faq-item');
+      const isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+      if (!isOpen) item.classList.add('open');
+    }
+    document.querySelectorAll('.step-card').forEach((card, i) => {
+      card.style.transitionDelay = `${i * 0.1}s`;
+    });
+  </script>
+</body>
+</html>
